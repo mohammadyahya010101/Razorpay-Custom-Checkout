@@ -1,4 +1,4 @@
-# Razorpay-Custom-Checkout
+# Razorpay Custom Checkout
 
 > <Subtitle>
 > Node JS demo of custom checkout with razorpay
