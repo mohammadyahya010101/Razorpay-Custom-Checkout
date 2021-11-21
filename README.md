@@ -10,6 +10,21 @@
   
 ---
 
+## Screenshots
+
+1.) Custom Card Form
+![Custom Card Form](https://raw.githubusercontent.com/mohammadyahya010101/Razorpay-Custom-Checkout/main/images/1.png)
+
+2.) Test Card Details
+![Test Card Details](https://raw.githubusercontent.com/mohammadyahya010101/Razorpay-Custom-Checkout/main/images/2.png)
+
+3.) Bank Verification
+![Bank Verification](https://raw.githubusercontent.com/mohammadyahya010101/Razorpay-Custom-Checkout/main/images/3.png)
+
+4.) Payment Success
+![Payment Success](https://raw.githubusercontent.com/mohammadyahya010101/Razorpay-Custom-Checkout/main/images/4.png)
+
+---
 ## Instructions to run
 
 ```
