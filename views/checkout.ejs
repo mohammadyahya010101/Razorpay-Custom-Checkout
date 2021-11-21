@@ -1,0 +1,129 @@
+<script>
+    var razorpay = new Razorpay({
+      key: 'YOUR_KEY_ID',
+    });
+    
+    
+    
+    </script>
+    
+<div class="container p-0">
+        <div class="card px-4">
+          <input type="hidden" name="order_id" value="<%= order_id %>">
+            <p class="h8 py-3">Payment Details</p>
+            <form id="parent-form">  
+                <div class="col-12">
+                    <div class="row gx-3">
+                    <div class="d-flex flex-column">
+                        <p class="text mb-1">Person Name</p> <input class="form-control mb-3" type="text" placeholder="John MacClain" id="name">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex flex-column">
+                        <p class="text mb-1">Card Number</p> <input class="form-control mb-3" id="card_number" type="text" placeholder="1234 5678 435678" name="card_number" value="4111 1111 1111 1111">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="d-flex flex-column">
+                        <p class="text mb-1">Expiry</p> <input class="form-control mb-3" id="card_expiry" type="text" placeholder="MM/YY" name="card_expiry">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="d-flex flex-column">
+                        <p class="text mb-1">CVV/CVC</p> <input class="form-control mb-3 pt-2 " id="card_cvv" type="password" placeholder="***" name="card_cvv">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <input type="button" value="<%= amount %>" name="amount" class="btn btn-primary mb-3" onclick="pay();">
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+      // shortcut function for document.getElementById
+    var getEl = document.getElementById.bind(document);
+    var formatter = Razorpay.setFormatter(getEl("parent-form"));
+    var cvvField = getEl('card_cvv');
+    
+    formatter.add('card', getEl('card_number'))
+      .on('network', function(o) {
+    
+        var type = this.type; // e.g. 'visa'
+    
+        // set length of cvv element based on amex card
+        var cvvlen = type === 'amex' ? 4 : 3;
+        cvvField.maxLength = cvvlen;
+        cvvField.pattern = '^[0-9]{' + cvvlen + '}$';
+    
+        getEl('card_type').innerHTML = type;
+      })
+      .on('change', function() {
+        var isValid = this.isValid();
+        getEl('card_valid').innerHTML = isValid ? 'valid' : 'invalid';
+    
+        // automatically focus next field if card number is valid and filled
+        if (isValid && this.el.value.length === this.caretPosition) {
+          getEl('card_expiry').focus();
+        }
+      })
+    
+    formatter.add('expiry', getEl('card_expiry'))
+      .on('change', function() {
+        var isValid = this.isValid();
+        getEl('expiry_valid').innerHTML = isValid ? 'valid' : 'invalid';
+    
+        // automatically focus next field if card number is valid and filled
+        if (isValid && this.el.value.length === this.caretPosition) {
+          getEl('card_cvv').focus();
+        }
+      })
+    
+      // method specific fields
+      
+    
+    
+    function pay(){
+    // has to be placed within user initiated context, such as click, in order for popup to open.
+    var data = {
+      amount: '<%= amount %>', // in currency subunits. Here 1000 = 1000 paise, which equals to ₹10
+      currency: "INR",// Default is INR. We support more than 90 currencies.
+      email: 'gaurav.kumar@example.com',
+      contact: '9123456780',
+      notes: {
+        address: 'Ground Floor, SJR Cyber, Laskar Hosur Road, Bengaluru',
+      },
+      order_id: '<%= order_id %>',// Replace with Order ID generated in Step 4
+      method: 'card',
+      card:{
+        number: $("#card_number").val(),
+        name: $("#name").val(),
+        expiry_month: parseInt($('#card_expiry').val().split('/')[0]),
+        expiry_year: parseInt($('#card_expiry').val().split('/')[1]),
+        cvv: parseInt($('#card_cvv').val())
+      }
+    };
+    
+    console.log(data);
+    razorpay.createPayment(data);
+    
+    razorpay.on('payment.success', function(resp) {
+      swal("Success!", "Your payment is sucess", "success");
+      $.ajax({
+        url: '/checkout/pay-verify',
+        type: 'POST',
+        data: {
+          razorpay_payment_id: resp.razorpay_payment_id,
+          razorpay_order_id: resp.razorpay_order_id,
+          razorpay_signature: resp.razorpay_signature,}
+        })
+    }); // will pass payment ID, order ID, and Razorpay signature to success handler.
+    
+      razorpay.on('payment.error', function(resp){swal("Error", "Your payment cannot be happend contact to admin", "error");}); // will pass error object to error handler
+    
+    
+    };
+    </script>
+    
+    
